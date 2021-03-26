@@ -9,9 +9,9 @@ else()
 endif()
   
 
-set(disable_warning_for_long_names "-diag-disable 5462")
+set(disable_warning_for_long_names "-Qdiag-disable:5462")
 set(traceback "-traceback")
-set(cpp "-cpp")
+set(cpp "-fpp")
 
 
 set(common_flags "${cpp} ${disable_warning_for_long_names}")
