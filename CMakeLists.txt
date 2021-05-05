@@ -52,8 +52,9 @@ endif()
 set (MAX_ASSERT_RANK 5 CACHE STRING "Maximum array rank for generated code.")
 option (SKIP_MPI "Skip building MPI support." NO)
 option (SKIP_OPENMP "Skip OpenMP compiler options." NO)
-option (SKIP_FHAMCREST "Skip building fHamcrest support" NO)
-option (SKIP_ROBUST "Skip building RobustRunner" NO)
+if (NOT WIN32)
+  option (SKIP_ROBUST "Skip building RobustRunner" NO)
+endif ()
 option (SKIP_ESMF "Skip building ESMF support" YES)
 option (ENABLE_TESTS "Build pFUnit tests" ${MAIN_PROJECT})
 
@@ -76,6 +77,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Skip MPI and RobustRunner on MinGW
 if (MINGW)
   set(SKIP_MPI YES)
+  set(SKIP_FHAMCREST NO)
+endif ()
+
+if (WIN32)
   set(SKIP_ROBUST YES)
 endif ()
 
