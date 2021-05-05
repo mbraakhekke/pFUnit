@@ -51,7 +51,7 @@ set(srcs
   TestFilter.F90
   NameFilter.F90
   FUnit_Core.F90
-  get_errno.c
+  #get_errno.c
   )
 
 # Support for RobustRunner
