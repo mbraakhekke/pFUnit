@@ -3,28 +3,42 @@ macro (CHECK_FORTRAN_SOURCE_RUN file var docstr)
   if (DEFINED CACHE{PFUNIT${var}})
   
     set( ${var} ${PFUNIT${var}})
-    
-  else ()
-   
-    try_run (
-      run compile
-      ${CMAKE_BINARY_DIR}
-      ${file}
-      CMAKE_FLAGS "-DCOMPILE_DEFINITIONS=${CMAKE_REQUIRED_DEFINITIONS}"
-      RUN_OUTPUT_VARIABLE ${var}
-      )
 
-    # Successful runs return "0", which is opposite of CMake sense of "if":
-    if (NOT run)
-      string(STRIP "${${var}}" ${var})
+  else ()
+
+    if ( NOT ("${CMAKE_REQUIRED_FLAGS}" STREQUAL ""))
+      string(REPLACE "=" "" compile_flags ${CMAKE_REQUIRED_FLAGS})
+    endif ()
+  
+    get_filename_component(binname ${file} NAME_WLE)
+  
+    execute_process(
+      COMMAND ${CMAKE_Fortran_COMPILER} ${CMAKE_REQUIRED_DEFINITIONS} ${compile_flags} ${file} "-o" "${binname}.exe"
+      RESULT_VARIABLE error
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      OUTPUT_QUIET
+      ERROR_QUIET
+      )
+    
+    if ( NOT error)
+      execute_process(
+        COMMAND "${binname}.exe"
+        RESULT_VARIABLE error
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        OUTPUT_VARIABLE out
+        )
+    endif ()
+
+    if (NOT error)
+      string(STRIP ${out} ${var})
       if (NOT CMAKE_REQUIRED_QUIET)
         message(STATUS "Performing Test ${var}: SUCCESS (value=${${var}})")
       endif ()
-      
+    
       set ( PFUNIT${var} ${${var}} CACHE STRING ${docstr} )
       
     else ()
-      
+
       if (NOT CMAKE_REQUIRED_QUIET)
         message(STATUS "Performing Test ${var}: FAILURE")
       endif ()

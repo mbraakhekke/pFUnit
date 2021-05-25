@@ -47,14 +47,20 @@ foreach (kind 32 64 80 128 256)
   
     set(CMAKE_REQUIRED_FLAGS = -fpp)
     set(CMAKE_REQUIRED_DEFINITIONS -D_KIND=REAL${kind})
-
-    try_compile (
-      code_compiles
-      ${CMAKE_BINARY_DIR}
-      ${PROJECT_SOURCE_DIR}/cmake/Trial_sources/REAL_KIND.F90
-      CMAKE_FLAGS "-DCOMPILE_DEFINITIONS=${CMAKE_REQUIRED_DEFINITIONS}")
+  
+    if ( NOT ("${CMAKE_REQUIRED_FLAGS}" STREQUAL ""))
+      string(REPLACE "=" "" compile_flags ${CMAKE_REQUIRED_FLAGS})
+    endif ()
     
-    if (code_compiles)
+    execute_process(
+      COMMAND ${CMAKE_Fortran_COMPILER} ${CMAKE_REQUIRED_DEFINITIONS} ${compile_flags} ${CMAKE_CURRENT_LIST_DIR}/trial_sources/REAL_KIND.F90 "-o" "REAL_KIND_${kind}.exe"
+      RESULT_VARIABLE error
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      OUTPUT_QUIET
+      ERROR_QUIET
+      )
+    
+    if (NOT error)
       CHECK_FORTRAN_SOURCE_RUN (
         ${PROJECT_SOURCE_DIR}/cmake/Trial_sources/REAL_KIND.F90
         _ISO_REAL${kind}
@@ -70,21 +76,23 @@ foreach (kind 32 64 80 128 256)
     
   else ()
     
-    try_compile (
-      code_compiles
-      ${CMAKE_BINARY_DIR}
-      ${PROJECT_SOURCE_DIR}/cmake/Trial_sources/REAL_KIND.F90
-      CMAKE_FLAGS "-DCOMPILE_DEFINITIONS=${CMAKE_REQUIRED_DEFINITIONS}")
-    
-    if (code_compiles)
+    execute_process(
+      COMMAND ${CMAKE_Fortran_COMPILER} ${CMAKE_REQUIRED_DEFINITIONS} ${compile_flags} ${CMAKE_CURRENT_LIST_DIR}/trial_sources/REAL_KIND.F90 "-o" "REAL_KIND_${kind}.exe"
+      RESULT_VARIABLE error
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      OUTPUT_QUIET
+      ERROR_QUIET
+      )
+
+    if (NOT error)
       CHECK_FORTRAN_SOURCE_RUN(
         ${PROJECT_SOURCE_DIR}/cmake/Trial_sources/REAL_KIND_IEEE_SUPPORT.F90
         _REAL${kind}_IEEE_SUPPORT
-        "Support for IEEE real(${kind}) kind"
+         "Support for IEEE real(${kind}) kind"
         )
         
     endif ()
-   
+
   endif ()
 
 endforeach()
