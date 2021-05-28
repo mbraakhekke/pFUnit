@@ -46,12 +46,9 @@ set (srcs
 set (generated_sources)
 function (expand in out rank)
   set (generated_sources ${generated_sources} ${CMAKE_CURRENT_BINARY_DIR}/${out} PARENT_SCOPE)
-  add_custom_command (
-    OUTPUT ${out}
+  execute_process(
     COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/multirank.py -i ${in} -o ${out} --rank=${rank}
-    DEPENDS ${in} ${CMAKE_CURRENT_SOURCE_DIR}/multirank.py
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT Generating ${out}
     )
 endfunction()
 
