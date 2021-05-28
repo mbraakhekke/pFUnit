@@ -7,20 +7,16 @@ foreach (def ${dir_defs})
 endforeach()
 
 function (expand in out)
-  set_source_files_properties (${CMAKE_CURRENT_BINARY_DIR}/${out} PROPERTIES GENERATED 1)
   set (generated_sources ${generated_sources} ${CMAKE_CURRENT_BINARY_DIR}/${out} PARENT_SCOPE)
-  add_custom_command(
-    OUTPUT ${out}
+  execute_process(
     COMMAND ${Python_EXECUTABLE} ${PFUNIT_SOURCE_DIR}/tools/overload_template.py --rank=${rank} -i ${in} -o ${out} ${python_defs}
-    DEPENDS ${in} ${PFUNIT_SOURCE_DIR}/tools/overload_template.py
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT Generating ${out}
     )
 endfunction()
 
 foreach(type Logical Integer Real Complex)
   foreach(rank RANGE ${MAX_ASSERT_RANK})
-    expand (${CMAKE_CURRENT_SOURCE_DIR}/Assert_${type}.tmpl Assert${type}_${rank}d.F90)
+    expand (${CMAKE_CURRENT_SOURCE_DIR}/Assert_${type}.tmpl "Assert${type}_${rank}d.F90")
   endforeach()
 endforeach()
 
